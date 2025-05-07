@@ -16,5 +16,9 @@ export default function Layout() {
 
   if (!fontsLoaded) return null;
 
-  return <Stack />;
+  return (
+    <Stack>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+    </Stack>
+  );
 }
