@@ -43,7 +43,7 @@ export default function Tab() {
         showsVerticalScrollIndicator={false}>
         {/* Flight state */}
         <View
-          className="mt-4 flex w-full flex-row items-center gap-[9px] rounded-lg border-[1px] bg-white px-4 py-3"
+          className="mt-4 flex w-full flex-row items-center gap-[9px] rounded-lg border-[1px] px-4 py-3"
           style={{
             ...shadowStyle,
             borderColor: stateBgColor,

@@ -1,4 +1,4 @@
-import { SafeAreaView, Text, Dimensions } from 'react-native';
+import { SafeAreaView, Pressable, Text, Dimensions, ScrollView } from 'react-native';
 
 import DeviceListItem from '~/components/DeviceListItem';
 
@@ -8,9 +8,20 @@ export default function Tab() {
   const mLeft = (width - windowWidth) / 2;
 
   return (
-    <SafeAreaView className="flex" style={{ width: windowWidth, marginLeft: mLeft }}>
-      <Text className="my-4 font-ibm-bold text-[36px]">Device List</Text>
-      <DeviceListItem name="AURA_G_01" isGroundStation connected={false} />
+    <SafeAreaView>
+      <ScrollView
+        className="mt-4 flex"
+        style={{ width: windowWidth, marginLeft: mLeft }}
+        contentContainerStyle={{ gap: 16, paddingBottom: 110 }}
+        showsVerticalScrollIndicator={false}>
+        <Text className="font-ibm-bold text-[36px]">Device List</Text>
+
+        <DeviceListItem name="AURA_G_01" isGroundStation connected={false} />
+
+        <Pressable className="flex w-full flex-row items-center justify-center gap-[9px] rounded-lg border-[1px] border-blue-300 bg-blue-300/10 px-4 py-3">
+          <Text className="font-ibm-medium text-lg text-blue-500">Refresh device list</Text>
+        </Pressable>
+      </ScrollView>
     </SafeAreaView>
   );
 }

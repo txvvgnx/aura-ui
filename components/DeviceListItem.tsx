@@ -37,7 +37,7 @@ const DeviceListItem: FC<Props> = ({ name, isGroundStation, connected }) => {
       </View>
 
       <View className="mx-4">
-        <Text className="font-ibm text-xl">{name}</Text>
+        <Text className="font-ibm-medium text-xl">{name}</Text>
         <View className="flex flex-row items-center gap-1">
           {connected ? (
             <Check size={18} strokeWidth={2} color="#00c951" />
