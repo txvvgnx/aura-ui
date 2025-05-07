@@ -1,4 +1,5 @@
-import { View, SafeAreaView, Text, Dimensions } from 'react-native';
+import { SafeAreaView, Text, Dimensions } from 'react-native';
+
 import DeviceListItem from '~/components/DeviceListItem';
 
 export default function Tab() {
