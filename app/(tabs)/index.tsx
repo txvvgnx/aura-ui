@@ -18,8 +18,8 @@ export default function Tab() {
 
         <DeviceListItem name="AURA_G_01" isGroundStation connected={false} />
 
-        <Pressable className="flex w-full flex-row items-center justify-center gap-[9px] rounded-lg border-[1px] border-blue-300 bg-blue-300/10 px-4 py-3">
-          <Text className="font-ibm-medium text-lg text-blue-500">Refresh device list</Text>
+        <Pressable className="flex w-full flex-row items-center justify-center gap-[9px] rounded-lg border-[1px] border-indigo-300 bg-indigo-300/10 px-4 py-3">
+          <Text className="font-ibm-medium text-lg text-indigo-500">Refresh device list</Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>
