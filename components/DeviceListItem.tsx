@@ -1,15 +1,27 @@
 import clsx from 'clsx';
 import { Check, CircleAlert, Rocket, SatelliteDish, Unplug } from 'lucide-react-native';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
 
+import CircleLoader from './CircleLoader';
+
+import useBLE, { FlightComputer } from '~/helpers/useBLE';
+
 type Props = {
-  name: string;
-  isGroundStation: boolean;
   connected: boolean;
+  device: FlightComputer;
 };
 
-const DeviceListItem: FC<Props> = ({ name, isGroundStation, connected }) => {
+const DeviceListItem: FC<Props> = ({ connected, device }) => {
+  const { connectToDevice } = useBLE();
+  const [attemptingConnection, setAttemptingConnection] = useState<boolean>(false);
+
+  const attemptConnection = async (device: FlightComputer) => {
+    setAttemptingConnection(true);
+    await connectToDevice(device);
+    setAttemptingConnection(false);
+  };
+
   return (
     <View
       className="flex h-[72px] w-full flex-row items-center rounded-lg border-[1px] border-gray-300 bg-white"
@@ -22,22 +34,25 @@ const DeviceListItem: FC<Props> = ({ name, isGroundStation, connected }) => {
       <View
         className={clsx(
           'flex h-full w-[72px] items-center justify-center rounded-bl-lg rounded-tl-lg px-3',
-          isGroundStation ? 'bg-green-500/20' : 'bg-red-500/20'
+          device.isGroundStation ? 'bg-green-500/20' : 'bg-red-500/20'
         )}>
-        {isGroundStation ? (
+        {device.isGroundStation ? (
           <SatelliteDish size={28} strokeWidth={1.5} color="#00c951" />
         ) : (
           <Rocket size={28} strokeWidth={1.5} color="#fb2c36" />
         )}
 
         <Text
-          className={clsx('mt-1 font-ibm', isGroundStation ? 'text-green-700' : 'text-red-700')}>
-          {isGroundStation ? 'Ground' : 'AURA'}
+          className={clsx(
+            'mt-1 font-ibm',
+            device.isGroundStation ? 'text-green-700' : 'text-red-700'
+          )}>
+          {device.isGroundStation ? 'Ground' : 'AURA'}
         </Text>
       </View>
 
       <View className="mx-4">
-        <Text className="font-ibm-medium text-xl">{name}</Text>
+        <Text className="font-ibm-medium text-xl">{device.localName ?? 'No name'}</Text>
         <View className="flex flex-row items-center gap-1">
           {connected ? (
             <Check size={18} strokeWidth={2} color="#00c951" />
@@ -52,11 +67,18 @@ const DeviceListItem: FC<Props> = ({ name, isGroundStation, connected }) => {
 
       {!connected && (
         <Pressable
-          onPress={() => console.log('Connect pressed')}
+          onPress={() => attemptConnection(device)}
+          disabled={attemptingConnection}
           android_ripple={{ color: 'rgba(0,0,0,0.2)', borderless: false }}
-          className="ml-auto flex h-full items-center justify-center rounded-br-lg rounded-tr-lg bg-gray-500/10 px-3">
-          <Unplug size={28} strokeWidth={1.5} />
-          <Text className="mt-1 font-ibm">Connect</Text>
+          className="ml-auto flex h-full w-24 items-center justify-center rounded-br-lg rounded-tr-lg bg-gray-500/10 px-3">
+          {attemptingConnection ? (
+            <CircleLoader size={28} />
+          ) : (
+            <>
+              <Unplug size={28} strokeWidth={1.5} />
+              <Text className="mt-1 font-ibm">Connect</Text>
+            </>
+          )}
         </Pressable>
       )}
     </View>
