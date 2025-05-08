@@ -28,7 +28,7 @@ export type FlightTelemetry = {
 };
 
 export const telemetryAtom = atom<FlightTelemetry>({
-  flightState: 'Armed',
+  flightState: 'Idle',
   stateColor: '#6a7282',
   stateBgColor: '#d1d5dc',
 
