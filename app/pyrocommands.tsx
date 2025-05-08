@@ -20,7 +20,7 @@ export default function PyroCommands() {
         showsVerticalScrollIndicator={false}>
         <Text className="font-ibm-bold text-3xl">Choose output to fire</Text>
         <Text className="-mt-3 font-ibm text-lg">
-          Pyro will fire 1 second after command received
+          Pyro will fire 1 second after command is received
         </Text>
 
         <CommandButton

@@ -22,7 +22,7 @@ export default function Tab() {
 
         <CommandButton
           name="ARM"
-          desc="Makes the flight computer ready for flight."
+          desc="Make the flight computer ready for flight."
           icon={<PlaneTakeoff size={56} stroke="#00b8db" strokeWidth={1.5} />}
           color="#00b8db"
           bgColor="#53eafd"

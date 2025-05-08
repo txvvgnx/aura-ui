@@ -12,7 +12,7 @@ type Props = {
 const DeviceListItem: FC<Props> = ({ name, isGroundStation, connected }) => {
   return (
     <View
-      className="flex h-[72px] w-full flex-row items-center rounded-lg bg-white"
+      className="flex h-[72px] w-full flex-row items-center rounded-lg border-[1px] border-gray-300 bg-white"
       style={{
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
