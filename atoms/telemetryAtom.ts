@@ -1,6 +1,7 @@
 import { atom } from 'jotai';
 
 export type FlightTelemetry = {
+  flightStateIndex: number;
   flightState: string;
   stateColor: string;
   stateBgColor: string;
@@ -28,6 +29,7 @@ export type FlightTelemetry = {
 };
 
 export const telemetryAtom = atom<FlightTelemetry>({
+  flightStateIndex: 0,
   flightState: 'Idle',
   stateColor: '#6a7282',
   stateBgColor: '#d1d5dc',

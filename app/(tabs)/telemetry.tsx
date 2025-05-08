@@ -1,3 +1,6 @@
+import * as Burnt from 'burnt';
+import * as Clipboard from 'expo-clipboard';
+import * as Speech from 'expo-speech';
 import { useAtom } from 'jotai';
 import {
   MoveUp,
@@ -16,7 +19,8 @@ import {
   Timer,
   ChartNoAxesGantt,
 } from 'lucide-react-native';
-import { SafeAreaView, View, Text, Dimensions, Image, ScrollView } from 'react-native';
+import { useRef, useEffect } from 'react';
+import { SafeAreaView, View, Text, Dimensions, Image, ScrollView, Pressable } from 'react-native';
 
 import { FlightTelemetry, telemetryAtom } from '~/atoms/telemetryAtom';
 import TelemetryBox from '~/components/TelemetryBox';
@@ -34,6 +38,66 @@ export default function Tab() {
   };
 
   const [telemetryData] = useAtom<FlightTelemetry>(telemetryAtom);
+
+  const copyCoordinates = async () => {
+    await Clipboard.setStringAsync(`${telemetryData.latitude},${telemetryData.longitude}`);
+    Burnt.toast({
+      title: 'Copied coordinates',
+      message: 'Check your clipboard!',
+      preset: 'done',
+      duration: 0.75,
+    });
+  };
+
+  const speakCooldown = () => {
+    setTimeout(() => {
+      canSpeakRef.current = true;
+    }, 500);
+  };
+
+  const canSpeakRef = useRef<boolean>(true);
+  const apogeeCalledOut = useRef<boolean>(false);
+  const maxAltitude = useRef<number>(0);
+  const maxVelocity = useRef<number>(0);
+  const thousandsAltitude = useRef<number>(0);
+
+  useEffect(() => {
+    async function speakTelemetry() {
+      const isSpeaking = await Speech.isSpeakingAsync();
+
+      if (telemetryData.flightStateIndex > 1 && canSpeakRef.current && !isSpeaking) {
+        canSpeakRef.current = false;
+
+        const apogeeInHundreds = Math.round(telemetryData.baroAltAGL / 100) * 100;
+        Speech.speak(apogeeInHundreds.toString(), { onDone: speakCooldown });
+      } else if (telemetryData.flightStateIndex === 4 && !apogeeCalledOut.current) {
+        apogeeCalledOut.current = true;
+        Speech.speak(
+          `Apogee at ${maxAltitude.current.toString()}, max velocity ${maxVelocity.current.toString()} meters per second`,
+          { onDone: speakCooldown }
+        );
+        thousandsAltitude.current = Math.round(maxAltitude.current / 1000) * 1000;
+      } else if (
+        telemetryData.flightStateIndex >= 4 &&
+        apogeeCalledOut.current &&
+        canSpeakRef.current &&
+        !isSpeaking &&
+        telemetryData.baroAltAGL < thousandsAltitude.current
+      ) {
+        canSpeakRef.current = false;
+        Speech.speak(
+          `Below ${thousandsAltitude.current.toString()}, descending ${telemetryData.gnssVertVel.toString()}`,
+          { onDone: speakCooldown }
+        );
+        thousandsAltitude.current = Math.floor(telemetryData.baroAltAGL / 1000) * 1000;
+      }
+    }
+
+    maxAltitude.current = Math.max(maxAltitude.current, telemetryData.baroAltAGL);
+    maxVelocity.current = Math.max(maxVelocity.current, telemetryData.accelVertVel);
+
+    speakTelemetry();
+  }, [telemetryData]);
 
   return (
     <SafeAreaView>
@@ -163,7 +227,7 @@ export default function Tab() {
         </View>
 
         {/* Latitude and longitude */}
-        <View className="flex flex-row gap-4">
+        <Pressable className="flex flex-row gap-4" onPress={copyCoordinates}>
           <TelemetryBox
             header="Latitude"
             icon={<MapPinPlus size={16} stroke="#6B7280" />}
@@ -176,7 +240,7 @@ export default function Tab() {
             value={telemetryData.longitude}
             unit=""
           />
-        </View>
+        </Pressable>
 
         {/* Accel XYZ */}
         <View className="flex flex-row gap-4">

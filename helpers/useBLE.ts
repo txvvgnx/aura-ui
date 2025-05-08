@@ -150,6 +150,7 @@ function useBLE() {
     const flightStateIndex = clamp(Number(dataPoints[0]), 0, 5);
 
     const baseData: FlightTelemetry = {
+      flightStateIndex,
       flightState: FLIGHT_STATES[flightStateIndex],
       stateColor: STATE_COLORS[flightStateIndex],
       stateBgColor: STATE_BG_COLORS[flightStateIndex],
