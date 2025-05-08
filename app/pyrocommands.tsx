@@ -4,6 +4,8 @@ import { SafeAreaView, Text, Dimensions, ScrollView } from 'react-native';
 
 import CommandButton from '~/components/CommandButton';
 
+const PYRO_WARN = 'MAKE SURE THE AREA IS CLEAR!\nYou cannot undo this! Continue?';
+
 export default function PyroCommands() {
   const { width } = Dimensions.get('window');
   const windowWidth = width * 0.9;
@@ -29,6 +31,8 @@ export default function PyroCommands() {
           icon={<Tally1 size={56} stroke="#fb2c36" strokeWidth={1.5} />}
           color="#fb2c36"
           bgColor="#ffa2a2"
+          commandStr="PYRO,1"
+          alertStr={`This will fire Output A.\n${PYRO_WARN}`}
         />
 
         <CommandButton
@@ -37,6 +41,8 @@ export default function PyroCommands() {
           icon={<Tally2 size={56} stroke="#fb2c36" strokeWidth={1.5} />}
           color="#fb2c36"
           bgColor="#ffa2a2"
+          commandStr="PYRO,2"
+          alertStr={`This will fire Output B.\n${PYRO_WARN}`}
         />
 
         <CommandButton
@@ -45,6 +51,8 @@ export default function PyroCommands() {
           icon={<Tally3 size={56} stroke="#fb2c36" strokeWidth={1.5} />}
           color="#fb2c36"
           bgColor="#ffa2a2"
+          commandStr="PYRO,3"
+          alertStr={`This will fire Output C.\n${PYRO_WARN}`}
         />
 
         <CommandButton
@@ -53,6 +61,8 @@ export default function PyroCommands() {
           icon={<Tally4 size={56} stroke="#fb2c36" strokeWidth={1.5} />}
           color="#fb2c36"
           bgColor="#ffa2a2"
+          commandStr="PYRO,4"
+          alertStr={`This will fire Output D.\n${PYRO_WARN}`}
         />
       </ScrollView>
     </SafeAreaView>

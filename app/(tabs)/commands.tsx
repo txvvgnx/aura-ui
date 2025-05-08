@@ -26,6 +26,8 @@ export default function Tab() {
           icon={<PlaneTakeoff size={56} stroke="#00b8db" strokeWidth={1.5} />}
           color="#00b8db"
           bgColor="#53eafd"
+          commandStr="ARM"
+          alertStr="This will ARM the flight computer. Continue?"
         />
 
         <CommandButton
@@ -34,6 +36,8 @@ export default function Tab() {
           icon={<PlaneLanding size={56} stroke="#00bc7d" strokeWidth={1.5} />}
           color="#00bc7d"
           bgColor="#5ee9b5"
+          commandStr="DISARM"
+          alertStr="This will DISARM the flight computer. Continue?"
         />
 
         <CommandButton

@@ -4,7 +4,7 @@ import { AlertTriangleIcon } from 'lucide-react-native';
 import { useState, useEffect } from 'react';
 import { SafeAreaView, Pressable, Text, Dimensions, ScrollView, View } from 'react-native';
 
-import { allDevicesAtom, connectedDeviceAtom } from '~/atoms/bleAtoms';
+import { allDevicesAtom, connectedDeviceAtom } from '~/atoms/bleAtom';
 import CircleLoader from '~/components/CircleLoader';
 import DeviceListItem from '~/components/DeviceListItem';
 import useBLE, { FlightComputer } from '~/helpers/useBLE';

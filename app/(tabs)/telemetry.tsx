@@ -1,3 +1,4 @@
+import { useAtom } from 'jotai';
 import {
   MoveUp,
   Circle,
@@ -17,6 +18,7 @@ import {
 } from 'lucide-react-native';
 import { SafeAreaView, View, Text, Dimensions, Image, ScrollView } from 'react-native';
 
+import { FlightTelemetry, telemetryAtom } from '~/atoms/telemetryAtom';
 import TelemetryBox from '~/components/TelemetryBox';
 
 export default function Tab() {
@@ -31,8 +33,7 @@ export default function Tab() {
     shadowRadius: 8,
   };
 
-  const stateColor = '#6a7282';
-  const stateBgColor = '#d1d5dc';
+  const [telemetryData] = useAtom<FlightTelemetry>(telemetryAtom);
 
   return (
     <SafeAreaView>
@@ -46,13 +47,13 @@ export default function Tab() {
           className="mt-4 flex w-full flex-row items-center gap-[9px] rounded-lg border-[1px] px-4 py-3"
           style={{
             ...shadowStyle,
-            borderColor: stateBgColor,
-            shadowColor: stateBgColor,
+            borderColor: telemetryData.stateBgColor,
+            shadowColor: telemetryData.stateBgColor,
             shadowOpacity: 0.7,
-            backgroundColor: `${stateBgColor}1a`,
+            backgroundColor: `${telemetryData.stateBgColor}1a`,
           }}>
-          <Circle size={16} fill={stateColor} stroke={stateBgColor} />
-          <Text className="font-ibm-semibold text-2xl">Idle</Text>
+          <Circle size={16} fill={telemetryData.stateColor} stroke={telemetryData.stateBgColor} />
+          <Text className="font-ibm-semibold text-2xl">{telemetryData.flightState}</Text>
         </View>
 
         {/* Baro altitude */}
@@ -64,7 +65,7 @@ export default function Tab() {
             <Text className="font-ibm-medium text-lg text-gray-500">Altitude</Text>
           </View>
           <View className="flex flex-row items-center">
-            <Text className="ml-1 font-ibm-semibold text-4xl">12002</Text>
+            <Text className="ml-1 font-ibm-semibold text-4xl">{telemetryData.baroAltAGL}</Text>
             <Text className="ml-[2px] font-ibm-semibold text-3xl text-gray-500">ft</Text>
           </View>
         </View>
@@ -74,14 +75,14 @@ export default function Tab() {
           <TelemetryBox
             header="Vertical Velocity"
             icon={<Gauge size={16} stroke="#6B7280" />}
-            value={201.42}
+            value={telemetryData.accelVertVel}
             unit="m/s"
           />
 
           <TelemetryBox
             header="GNSS Velocity"
             icon={<CircleGauge size={16} stroke="#6B7280" />}
-            value={198.24}
+            value={telemetryData.gnssVertVel}
             unit="m/s"
           />
         </View>
@@ -112,7 +113,7 @@ export default function Tab() {
                 height: '80%',
                 top: '10%',
                 left: '10%',
-                transform: [{ rotate: '0deg' }],
+                transform: [{ rotate: `${Math.round(telemetryData.tiltAngle).toString()}deg` }],
                 zIndex: 1,
               }}
               resizeMode="contain"
@@ -128,7 +129,7 @@ export default function Tab() {
                 <Text className="font-ibm-medium text-gray-500">Tilt Angle</Text>
               </View>
               <View className="flex flex-row items-start">
-                <Text className="ml-1 font-ibm-semibold text-2xl">180.32</Text>
+                <Text className="ml-1 font-ibm-semibold text-2xl">{telemetryData.tiltAngle}</Text>
                 <Text className="ml-[2px] font-ibm-semibold text-xl text-gray-500">°</Text>
               </View>
             </View>
@@ -141,7 +142,7 @@ export default function Tab() {
                 <Text className="font-ibm-medium text-gray-500">GNSS Alt</Text>
               </View>
               <View className="flex flex-row items-end">
-                <Text className="ml-1 font-ibm-medium text-xl">20124</Text>
+                <Text className="ml-1 font-ibm-medium text-xl">{telemetryData.gnssAltAGL}</Text>
                 <Text className="ml-[2px] font-ibm-semibold text-lg text-gray-500">m</Text>
               </View>
             </View>
@@ -154,7 +155,7 @@ export default function Tab() {
                 <Text className="font-ibm-medium text-gray-500">Baro Vel</Text>
               </View>
               <View className="flex flex-row items-baseline">
-                <Text className="ml-1 font-ibm-medium text-lg">-180.32</Text>
+                <Text className="ml-1 font-ibm-medium text-lg">{telemetryData.baroVertVel}</Text>
                 <Text className="ml-[2px] font-ibm-semibold text-gray-500">m/s</Text>
               </View>
             </View>
@@ -166,13 +167,13 @@ export default function Tab() {
           <TelemetryBox
             header="Latitude"
             icon={<MapPinPlus size={16} stroke="#6B7280" />}
-            value={-37.48214}
+            value={telemetryData.latitude}
             unit=""
           />
           <TelemetryBox
             header="Longitude"
             icon={<MapPinMinus size={16} stroke="#6B7280" />}
-            value={118.84824}
+            value={telemetryData.longitude}
             unit=""
           />
         </View>
@@ -182,19 +183,19 @@ export default function Tab() {
           <TelemetryBox
             header="Accel X"
             icon={<Move3D size={16} stroke="#6B7280" />}
-            value={-9.99}
+            value={telemetryData.accelXYZ[0]}
             unit="g"
           />
           <TelemetryBox
             header="Accel Y"
             icon={<Move3D size={16} stroke="#6B7280" />}
-            value={0.0}
+            value={telemetryData.accelXYZ[1]}
             unit="g"
           />
           <TelemetryBox
             header="Accel Z"
             icon={<Move3D size={16} stroke="#6B7280" />}
-            value={0.0}
+            value={telemetryData.accelXYZ[2]}
             unit="g"
           />
         </View>
@@ -204,21 +205,21 @@ export default function Tab() {
           <TelemetryBox
             header="Gyro X"
             icon={<Rotate3D size={16} stroke="#6B7280" />}
-            value={-9.99}
+            value={telemetryData.gyroXYZ[0]}
             unit="dps"
             bigUnit={false}
           />
           <TelemetryBox
             header="Gyro Y"
             icon={<Rotate3D size={16} stroke="#6B7280" />}
-            value={0.0}
+            value={telemetryData.gyroXYZ[0]}
             unit="dps"
             bigUnit={false}
           />
           <TelemetryBox
             header="Gyro Z"
             icon={<Rotate3D size={16} stroke="#6B7280" />}
-            value={0.0}
+            value={telemetryData.gyroXYZ[0]}
             unit="dps"
             bigUnit={false}
           />
@@ -229,21 +230,21 @@ export default function Tab() {
           <TelemetryBox
             header="RSSI"
             icon={<Antenna size={16} stroke="#6B7280" />}
-            value={-104}
+            value={telemetryData.rssi}
             unit="dBm"
             bigUnit={false}
           />
           <TelemetryBox
             header="SNR"
             icon={<AudioLines size={16} stroke="#6B7280" />}
-            value={4}
+            value={telemetryData.snr}
             unit="dB"
             bigUnit={false}
           />
           <TelemetryBox
             header="Sig RSSI"
             icon={<UtilityPole size={16} stroke="#6B7280" />}
-            value={-89}
+            value={telemetryData.signalRssi}
             unit="dBm"
             bigUnit={false}
           />
@@ -252,16 +253,16 @@ export default function Tab() {
         {/* Packet timing stats */}
         <View className="flex flex-row gap-4">
           <TelemetryBox
-            header="Last packet"
+            header="Packet spacing"
             icon={<Timer size={16} stroke="#6B7280" />}
-            value={1001}
+            value={telemetryData.packetSpacing}
             unit="ms"
             bigUnit={false}
           />
           <TelemetryBox
             header="Packet rate"
             icon={<ChartNoAxesGantt size={16} stroke="#6B7280" />}
-            value={15}
+            value={Math.round(1000 / telemetryData.packetSpacing)}
             unit="Hz"
             bigUnit={false}
           />
