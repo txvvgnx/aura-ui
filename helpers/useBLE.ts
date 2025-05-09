@@ -1,4 +1,5 @@
 /* eslint-disable no-bitwise */
+import * as Burnt from 'burnt';
 import * as ExpoDevice from 'expo-device';
 import { useAtom } from 'jotai';
 import { PermissionsAndroid, Platform } from 'react-native';
@@ -108,6 +109,11 @@ function useBLE() {
       });
     } catch (e) {
       console.log('FAILED TO CONNECT', e);
+      Burnt.toast({
+        title: 'Failed to connect to device',
+        preset: 'error',
+        duration: 0.75,
+      });
     }
   };
 
@@ -193,6 +199,11 @@ function useBLE() {
   const onDataUpdate = (error: BleError | null, characteristic: Characteristic | null) => {
     if (error) {
       console.log(error);
+      Burnt.toast({
+        title: 'Device disconnected',
+        preset: 'error',
+        duration: 0.75,
+      });
       return;
     } else if (!characteristic?.value) {
       console.log('No Data was received');
@@ -230,9 +241,19 @@ function useBLE() {
         COMMAND_CHARACTERISTIC_UUID,
         base64Data
       );
-      console.log('Command sent:', command);
+      Burnt.toast({
+        title: 'Command sent successfully!',
+        message: `${command} was sent`,
+        preset: 'done',
+        duration: 0.75,
+      });
     } catch (e) {
       console.error('Failed to send command:', e);
+      Burnt.toast({
+        title: 'Failed to send command',
+        preset: 'error',
+        duration: 0.75,
+      });
     }
   };
 
