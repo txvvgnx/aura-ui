@@ -249,7 +249,7 @@ function useBLE() {
         base64Data
       );
       Burnt.toast({
-        title: 'Command sent successfully!',
+        title: 'Command sent!',
         message: `${command} was sent`,
         preset: 'done',
         duration: 0.75,
