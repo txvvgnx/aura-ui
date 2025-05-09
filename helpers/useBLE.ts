@@ -231,7 +231,14 @@ function useBLE() {
   };
 
   const sendCommand = async (device: Device | null, command: string) => {
-    if (!device) return;
+    if (!device) {
+      Burnt.toast({
+        title: 'No device connected',
+        preset: 'error',
+        duration: 0.75,
+      });
+      return;
+    }
 
     const base64Data = base64.encode(command);
 
