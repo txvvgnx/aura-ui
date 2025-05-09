@@ -19,7 +19,7 @@ import {
   Timer,
   ChartNoAxesGantt,
 } from 'lucide-react-native';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { SafeAreaView, View, Text, Dimensions, Image, ScrollView, Pressable } from 'react-native';
 
 import { FlightTelemetry, telemetryAtom } from '~/atoms/telemetryAtom';
@@ -52,7 +52,7 @@ export default function Tab() {
   const speakCooldown = () => {
     setTimeout(() => {
       canSpeakRef.current = true;
-    }, 500);
+    }, 100);
   };
 
   const canSpeakRef = useRef<boolean>(true);
@@ -60,6 +60,7 @@ export default function Tab() {
   const maxAltitude = useRef<number>(0);
   const maxVelocity = useRef<number>(0);
   const thousandsAltitude = useRef<number>(0);
+  const hundredsAltitude = useRef<number>(0);
 
   useEffect(() => {
     async function speakTelemetry() {
@@ -68,28 +69,39 @@ export default function Tab() {
       if (telemetryData.flightStateIndex > 1 && canSpeakRef.current && !isSpeaking) {
         canSpeakRef.current = false;
 
-        const apogeeInHundreds = Math.round(telemetryData.baroAltAGL / 100) * 100;
-        Speech.speak(apogeeInHundreds.toString(), { onDone: speakCooldown });
+        const altitudeInHundreds = Math.round(telemetryData.baroAltAGL / 100) * 100;
+        Speech.speak(altitudeInHundreds.toString(), { onDone: speakCooldown });
       } else if (telemetryData.flightStateIndex === 4 && !apogeeCalledOut.current) {
         apogeeCalledOut.current = true;
         Speech.speak(
-          `Apogee at ${maxAltitude.current.toString()}, max velocity ${maxVelocity.current.toString()} meters per second`,
+          `Apogee at ${maxAltitude.current.toString()} feet, max velocity ${maxVelocity.current.toString()} meters per second`,
           { onDone: speakCooldown }
         );
         thousandsAltitude.current = Math.round(maxAltitude.current / 1000) * 1000;
+        hundredsAltitude.current = 900;
       } else if (
         telemetryData.flightStateIndex >= 4 &&
         apogeeCalledOut.current &&
         canSpeakRef.current &&
-        !isSpeaking &&
-        telemetryData.baroAltAGL < thousandsAltitude.current
+        !isSpeaking
       ) {
-        canSpeakRef.current = false;
-        Speech.speak(
-          `Below ${thousandsAltitude.current.toString()}, descending ${telemetryData.gnssVertVel.toString()}`,
-          { onDone: speakCooldown }
-        );
-        thousandsAltitude.current = Math.floor(telemetryData.baroAltAGL / 1000) * 1000;
+        const alt = telemetryData.baroAltAGL;
+
+        if (alt < thousandsAltitude.current && thousandsAltitude.current > 1000) {
+          canSpeakRef.current = false;
+          Speech.speak(
+            `Below ${thousandsAltitude.current.toString()}, descending ${telemetryData.gnssVertVel.toString()}`,
+            { onDone: speakCooldown }
+          );
+          thousandsAltitude.current = Math.max(1000, thousandsAltitude.current - 1000);
+        } else if (alt < 1000 && alt < hundredsAltitude.current) {
+          canSpeakRef.current = false;
+          Speech.speak(
+            `Below ${hundredsAltitude.current.toString()}, descending ${telemetryData.gnssVertVel.toString()}`,
+            { onDone: speakCooldown }
+          );
+          hundredsAltitude.current = Math.max(0, hundredsAltitude.current - 100);
+        }
       }
     }
 
@@ -99,6 +111,33 @@ export default function Tab() {
     speakTelemetry();
   }, [telemetryData]);
 
+  const [timeSinceLastPacket, setTimeSinceLastPacket] = useState('0');
+  const lastPacketTimeRef = useRef(Date.now());
+  const lastPacketIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    lastPacketTimeRef.current = Date.now();
+    setTimeSinceLastPacket('0');
+  }, [telemetryData]);
+
+  useEffect(() => {
+    lastPacketIntervalRef.current = setInterval(() => {
+      const now = Date.now();
+      const elapsed = now - lastPacketTimeRef.current;
+      setTimeSinceLastPacket((elapsed / 1000).toFixed(1));
+    }, 100);
+
+    return () => {
+      if (lastPacketIntervalRef.current !== null) {
+        clearInterval(lastPacketIntervalRef.current as ReturnType<typeof setInterval>);
+      }
+    };
+  }, []);
+
+  const testSpeech = () => {
+    Speech.speak('Apogee at 14728 feet, max velocity 528 meters per second');
+  };
+
   return (
     <SafeAreaView>
       <ScrollView
@@ -107,17 +146,34 @@ export default function Tab() {
         contentContainerStyle={{ gap: 16, paddingBottom: 110 }}
         showsVerticalScrollIndicator={false}>
         {/* Flight state */}
-        <View
-          className="mt-4 flex w-full flex-row items-center gap-[9px] rounded-lg border-[1px] px-4 py-3"
-          style={{
-            ...shadowStyle,
-            borderColor: telemetryData.stateBgColor,
-            shadowColor: telemetryData.stateBgColor,
-            shadowOpacity: 0.7,
-            backgroundColor: `${telemetryData.stateBgColor}1a`,
-          }}>
-          <Circle size={16} fill={telemetryData.stateColor} stroke={telemetryData.stateBgColor} />
-          <Text className="font-ibm-semibold text-2xl">{telemetryData.flightState}</Text>
+        <View className="flex flex-row gap-2">
+          <View
+            className="mt-4 flex w-2/3 flex-row items-center gap-[9px] rounded-lg border-[1px] px-4 py-3"
+            style={{
+              ...shadowStyle,
+              borderColor: telemetryData.stateBgColor,
+              shadowColor: telemetryData.stateBgColor,
+              shadowOpacity: 0.7,
+              backgroundColor: `${telemetryData.stateBgColor}1a`,
+            }}>
+            <Circle size={16} fill={telemetryData.stateColor} stroke={telemetryData.stateBgColor} />
+            <Text className="font-ibm-semibold text-2xl">{telemetryData.flightState}</Text>
+          </View>
+          <View className="flex flex-1 flex-row gap-2">
+            <View
+              className="mt-4 flex flex-1 items-center rounded-lg border-[1px] border-gray-300 p-1"
+              style={{ ...shadowStyle }}>
+              <Text className="font-ibm text-xs text-gray-500">Last Pkt</Text>
+              <Text className="mt-1 font-ibm">{timeSinceLastPacket}</Text>
+            </View>
+            <Pressable
+              onPress={testSpeech}
+              className="mt-4 flex flex-1 items-center rounded-lg border-[1px] border-gray-300 p-1"
+              style={{ ...shadowStyle }}>
+              <Text className="font-ibm text-xs text-gray-500">RSSI</Text>
+              <Text className="mt-1 font-ibm">{telemetryData.rssi}</Text>
+            </Pressable>
+          </View>
         </View>
 
         {/* Baro altitude */}
