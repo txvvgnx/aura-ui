@@ -1,5 +1,5 @@
 import { Stack } from 'expo-router';
-import { Power, PowerOff, Tally1, Tally2, Tally3, Tally4 } from 'lucide-react-native';
+import { Power, PowerOff } from 'lucide-react-native';
 import { SafeAreaView, Dimensions, ScrollView } from 'react-native';
 
 import CommandButton from '~/components/CommandButton';
@@ -24,7 +24,7 @@ export default function ControlCameras() {
           icon={<Power size={56} stroke="#615fff" strokeWidth={1.5} />}
           color="#615fff"
           bgColor="#a3b3ff"
-          commandStr="CMCTL,1"
+          commandStr="CAMCTL,1"
           alertStr="This will turn ON cameras. Continue?"
         />
 
@@ -34,7 +34,7 @@ export default function ControlCameras() {
           icon={<PowerOff size={56} stroke="#615fff" strokeWidth={1.5} />}
           color="#615fff"
           bgColor="#a3b3ff"
-          commandStr="CMCTL,0"
+          commandStr="CAMCTL,0"
           alertStr="This will turn OFF cameras. Continue?"
         />
       </ScrollView>

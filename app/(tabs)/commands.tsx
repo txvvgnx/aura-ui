@@ -60,7 +60,7 @@ export default function Tab() {
 
         <CommandButton
           name="Control Cameras"
-          desc="Set the state of GPIO40"
+          desc="Set the state of GPIO39"
           icon={<Camera size={56} stroke="#615fff" strokeWidth={1.5} />}
           color="#615fff"
           bgColor="#a3b3ff"
