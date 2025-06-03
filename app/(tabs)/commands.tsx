@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Flame, PlaneLanding, PlaneTakeoff } from 'lucide-react-native';
+import { Camera, Flame, PlaneLanding, PlaneTakeoff, Radio } from 'lucide-react-native';
 import { SafeAreaView, Text, Dimensions, ScrollView } from 'react-native';
 
 import CommandButton from '~/components/CommandButton';
@@ -47,6 +47,24 @@ export default function Tab() {
           color="#ff6900"
           bgColor="#ffb86a"
           onPress={() => router.push('/pyrocommands')}
+        />
+
+        <CommandButton
+          name="Change Frequency"
+          desc="Use a different radio frequency"
+          icon={<Radio size={56} stroke="#ad46ff" strokeWidth={1.5} />}
+          color="#ad46ff"
+          bgColor="#dab2ff"
+          onPress={() => router.push('/frequencyset')}
+        />
+
+        <CommandButton
+          name="Control Cameras"
+          desc="Set the state of GPIO40"
+          icon={<Camera size={56} stroke="#615fff" strokeWidth={1.5} />}
+          color="#615fff"
+          bgColor="#a3b3ff"
+          onPress={() => router.push('/controlcameras')}
         />
       </ScrollView>
     </SafeAreaView>

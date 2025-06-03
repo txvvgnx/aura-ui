@@ -15,6 +15,7 @@ type Props = {
   bgColor: string;
   commandStr?: string;
   alertStr?: string;
+  onPressCallback?: () => void;
 } & PressableProps;
 
 const CommandButton: FC<Props> = ({
@@ -25,6 +26,7 @@ const CommandButton: FC<Props> = ({
   bgColor,
   commandStr = '',
   alertStr = '',
+  onPressCallback,
   ...pressableProps
 }) => {
   const [connectedDevice] = useAtom(connectedDeviceInstanceAtom);
@@ -49,7 +51,13 @@ const CommandButton: FC<Props> = ({
 
     Alert.alert('Confirm ' + msg, alertMsg, [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'OK', onPress: () => handleSendCommand(msg) },
+      {
+        text: 'OK',
+        onPress: () => {
+          handleSendCommand(msg);
+          if (onPressCallback) onPressCallback();
+        },
+      },
     ]);
   };
 
